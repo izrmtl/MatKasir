@@ -5,33 +5,27 @@
 /**
  * Mencetak nota/struk penjualan berdasarkan ID penjualan.
  * Fungsi ini mengambil data penjualan dan detailnya, lalu membuka jendela baru
- * untuk mencetak HTML yang telah diformat.
+ * untuk mencetak HTML yang telah diformat untuk printer thermal.
  * @param {number} saleId - ID penjualan yang akan dicetak
  */
 async function printReceipt(saleId) {
     try {
-        // Langkah 1: Ambil data penjualan umum dari API
-        // Idealnya, ada endpoint API spesifik seperti `?action=get_sale&id=`
-        // Saat ini, kita mengambil semua data dan mencari yang relevan di klien.
-        const saleResponse = await fetch(`${API_URL}?action=get_sales`);
+        // Langkah 1: Ambil data penjualan utama
+        const saleResponse = await fetch(`${API_URL}?action=get_sale&id=${saleId}`);
         
-        // Periksa jika respons dari server tidak berhasil (misalnya error 500)
         if (!saleResponse.ok) {
-            throw new Error(`Gagal mengambil data penjualan: ${saleResponse.statusText}`);
+            throw new Error(`Gagal mengambil data penjualan: ${saleResponse.statusText} (${saleResponse.status})`);
         }
 
         const saleResult = await saleResponse.json();
         
         if (saleResult.status !== 200) {
-            showNotification('Gagal memuat data penjualan', 'error');
-            return;
+            throw new Error(saleResult.message || 'Gagal memuat data penjualan dari server');
         }
         
-        // Cari penjualan spesifik berdasarkan ID
-        const sale = saleResult.data.find(s => s.id_penjualan == saleId);
+        const sale = saleResult.data;
         if (!sale) {
-            showNotification('Data penjualan tidak ditemukan', 'error');
-            return;
+            throw new Error('Data penjualan tidak ditemukan di respons server');
         }
         
         // Langkah 2: Ambil detail item dari penjualan tersebut
@@ -44,26 +38,24 @@ async function printReceipt(saleId) {
         const detailResult = await detailResponse.json();
         
         if (detailResult.status !== 200) {
-            showNotification('Gagal memuat detail penjualan', 'error');
-            return;
+            throw new Error(detailResult.message || 'Gagal memuat detail item dari server');
         }
         
         const details = detailResult.data;
         
-        // Langkah 3: Buat HTML untuk nota
-        const receiptHTML = generateReceiptHTML(sale, details);
+        // Langkah 3: Buat HTML untuk nota thermal
+        const receiptHTML = generateThermalReceiptHTML(sale, details);
         
         // Langkah 4: Buka jendela cetak dan tulis HTML
-        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        const printWindow = window.open('', '_blank', 'width=400,height=600');
         printWindow.document.write(receiptHTML);
-        printWindow.document.close(); // Penting untuk memastikan rendering selesai
+        printWindow.document.close();
         
         // Tunggu sebentar agar konten termuat sebelum memunculkan dialog cetak
         setTimeout(() => {
             printWindow.print();
-            // Opsional: Tutup jendela setelah dialog cetak ditutup
             printWindow.onafterprint = () => printWindow.close();
-        }, 500); // Sedikit diperlambat untuk memastikan semua aset (font, dll) dimuat
+        }, 500);
         
     } catch (error) {
         console.error('Error printing receipt:', error);
@@ -72,17 +64,15 @@ async function printReceipt(saleId) {
 }
 
 /**
- * Menghasilkan string HTML untuk nota/struk.
+ * Menghasilkan string HTML untuk nota/struk yang dioptimalkan untuk printer thermal.
  * @param {object} sale - Objek data penjualan.
  * @param {Array} details - Array detail item yang dibeli.
  * @returns {string} String HTML yang lengkap untuk nota.
  */
-function generateReceiptHTML(sale, details) {
+function generateThermalReceiptHTML(sale, details) {
     const now = new Date();
     const saleDate = new Date(sale.tanggal_penjualan);
     
-    // Template literal untuk HTML nota
-    // CSS disematkan langsung agar tidak tergantung pada file eksternal saat dicetak
     return `
 <!DOCTYPE html>
 <html>
@@ -90,139 +80,131 @@ function generateReceiptHTML(sale, details) {
     <meta charset="UTF-8">
     <title>Nota #${sale.id_penjualan}</title>
     <style>
-        /* Reset dan gaya dasar */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        /* Gaya untuk tampilan di layar (preview) */
         body {
-            font-family: 'Courier New', monospace; /* Font standar untuk struk */
-            padding: 20px;
-            max-width: 80mm; /* Lebar kertas struk tipikal */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            line-height: 1.3;
+            width: 350px; /* Lebar preview di layar */
             margin: 0 auto;
+            padding: 15px;
+            background-color: #f5f5f5;
+            color: #333;
         }
-        
-        .receipt {
-            border: 2px dashed #000;
-            padding: 10px;
+
+        /* Gaya khusus untuk media cetak (printer thermal) */
+        @media print {
+            @page {
+                size: 80mm auto; /* Lebar 80mm, tinggi otomatis */
+                margin: 0mm 5mm; /* Margin kecil di kiri/kanan */
+            }
+
+            body {
+                width: auto; /* Biarkan mengikuti lebar kertas */
+                margin: 0;
+                padding: 5px; /* Padding minimal */
+                font-size: 10pt; /* Ukuran font lebih kecil untuk cetakan */
+                -webkit-print-color-adjust: exact; /* Pertahankan warna jika perlu */
+                color-adjust: exact;
+            }
         }
-        
-        .header {
+
+        .receipt-container {
             text-align: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
         }
-        
+
+        .header {
+            margin-bottom: 15px;
+        }
+
         .header h1 {
             font-size: 18px;
-            margin-bottom: 5px;
+            margin: 0;
+            font-weight: bold;
         }
-        
+
         .header p {
+            margin: 3px 0;
             font-size: 11px;
-            margin: 2px 0;
         }
-        
-        .info-section {
-            margin-bottom: 15px;
-            font-size: 12px;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 10px;
+
+        .separator {
+            border-top: 1px dashed #333;
+            margin: 10px 0;
         }
-        
+
+        .info-section, .totals-section {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin: 3px 0;
-        }
-        
-        .items-table {
-            width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 3px;
             font-size: 11px;
         }
-        
-        .items-table th {
-            border-top: 1px solid #000;
-            border-bottom: 1px solid #000;
-            padding: 5px 0;
-            text-align: left;
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 11px;
         }
-        
+
         .items-table td {
-            padding: 5px 0;
-            border-bottom: 1px dashed #ccc;
+            padding: 2px 0;
+            vertical-align: top;
         }
         
         .item-name {
-            font-weight: bold;
+            width: 55%;
         }
-        
-        .item-details {
-            font-size: 10px;
-            color: #666;
+
+        .item-qty {
+            width: 15%;
+            text-align: center;
         }
-        
-        .totals {
-            border-top: 2px solid #000;
-            padding-top: 10px;
-            margin-bottom: 15px;
+
+        .item-price {
+            width: 30%;
+            text-align: right;
         }
-        
+
+        .totals-section {
+            font-size: 11px;
+        }
+
         .total-row {
             display: flex;
             justify-content: space-between;
-            margin: 5px 0;
-            font-size: 12px;
+            margin-bottom: 3px;
         }
-        
+
         .total-row.grand-total {
-            font-size: 16px;
             font-weight: bold;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 2px double #000;
+            font-size: 12px;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid #333;
         }
-        
+
         .footer {
-            text-align: center;
             margin-top: 15px;
-            border-top: 2px solid #000;
-            padding-top: 10px;
-            font-size: 11px;
-        }
-        
-        .footer p {
-            margin: 3px 0;
-        }
-        
-        /* Gaya khusus untuk media cetak */
-        @media print {
-            body {
-                padding: 0;
-            }
-            
-            .receipt {
-                border: none; /* Hilangkan border saat cetak */
-            }
-            
-            @page {
-                margin: 0;
-                size: 80mm auto; /* Atur ukuran halaman */
-            }
+            text-align: center;
+            font-size: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="receipt">
+    <div class="receipt-container">
         <div class="header">
             <h1>TOKO UMKM</h1>
             <p>Jl. Contoh No. 123</p>
             <p>Telp: 021-12345678</p>
         </div>
+        
+        <div class="separator"></div>
         
         <div class="info-section">
             <div class="info-row">
@@ -231,77 +213,51 @@ function generateReceiptHTML(sale, details) {
             </div>
             <div class="info-row">
                 <span>Tanggal:</span>
-                <span>${saleDate.toLocaleDateString('id-ID', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                })}</span>
-            </div>
-            <div class="info-row">
-                <span>Waktu:</span>
-                <span>${saleDate.toLocaleTimeString('id-ID', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}</span>
+                <span>${saleDate.toLocaleDateString('id-ID')}</span>
             </div>
             <div class="info-row">
                 <span>Kasir:</span>
-                <span>Admin</span>
-            </div>
-            <div class="info-row">
-                <span>Pelanggan:</span>
-                <span>${sale.nama_pelanggan || 'Pelanggan Umum'}</span>
+                <span>${sale.kasir || 'Admin'}</span>
             </div>
         </div>
+
+        <div class="separator"></div>
         
         <table class="items-table">
-            <thead>
-                <tr>
-                    <th style="width: 60%;">Item</th>
-                    <th style="width: 20%; text-align: center;">Qty</th>
-                    <th style="width: 20%; text-align: right;">Subtotal</th>
-                </tr>
-            </thead>
             <tbody>
                 ${details.map(item => `
                     <tr>
-                        <td>
-                            <div class="item-name">${item.nama_produk}</div>
-                            <div class="item-details">
-                                @ Rp ${formatNumber(item.harga_satuan)}
-                            </div>
-                        </td>
-                        <td style="text-align: center;">${item.jumlah}</td>
-                        <td style="text-align: right;">Rp ${formatNumber(item.subtotal)}</td>
+                        <td class="item-name">${item.nama_produk}</td>
+                        <td class="item-qty">${item.jumlah}x</td>
+                        <td class="item-price">${formatNumber(item.subtotal)}</td>
                     </tr>
                 `).join('')}
             </tbody>
         </table>
         
-        <div class="totals">
+        <div class="separator"></div>
+        
+        <div class="totals-section">
             <div class="total-row">
-                <span>Subtotal:</span>
-                <span>Rp ${formatNumber(sale.total_harga)}</span>
+                <span>Total:</span>
+                <span>${formatNumber(sale.total_harga)}</span>
+            </div>
+            <div class="total-row">
+                <span>Bayar:</span>
+                <span>${formatNumber(sale.bayar)}</span>
             </div>
             <div class="total-row grand-total">
-                <span>TOTAL:</span>
-                <span>Rp ${formatNumber(sale.total_harga)}</span>
-            </div>
-            <div class="total-row" style="margin-top: 10px;">
-                <span>Bayar:</span>
-                <span>Rp ${formatNumber(sale.bayar)}</span>
-            </div>
-            <div class="total-row">
                 <span>Kembalian:</span>
-                <span>Rp ${formatNumber(sale.kembalian)}</span>
+                <span>${formatNumber(sale.kembalian)}</span>
             </div>
         </div>
+        
+        <div class="separator"></div>
         
         <div class="footer">
             <p>*** TERIMA KASIH ***</p>
             <p>Barang yang sudah dibeli</p>
-            <p>tidak dapat ditukar/dikembalikan</p>
-            <p style="margin-top: 10px;">Dicetak: ${now.toLocaleString('id-ID')}</p>
+            <p>tidak dapat ditukar/kembali</p>
         </div>
     </div>
 </body>
@@ -311,7 +267,6 @@ function generateReceiptHTML(sale, details) {
 
 /**
  * Fungsi pembantu untuk mencetak otomatis setelah checkout berhasil.
- * Ini akan menampilkan dialog konfirmasi sebelum mencetak.
  * @param {number} saleId - ID penjualan yang baru saja selesai.
  */
 function autoPrintReceipt(saleId) {
@@ -321,6 +276,5 @@ function autoPrintReceipt(saleId) {
 }
 
 // Pastikan fungsi-fungsi ini dapat diakses secara global
-// sehingga dapat dipanggil dari atribut onclick di HTML.
 window.printReceipt = printReceipt;
 window.autoPrintReceipt = autoPrintReceipt;

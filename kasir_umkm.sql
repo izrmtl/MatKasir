@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 02 Des 2025 pada 14.06
+-- Waktu pembuatan: 03 Des 2025 pada 05.27
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -41,8 +41,10 @@ CREATE TABLE `detail_penjualan` (
 --
 
 INSERT INTO `detail_penjualan` (`id_detail`, `id_penjualan`, `id_produk`, `jumlah`, `harga_satuan`, `subtotal`) VALUES
-(18, 7, 5, 1, 12000000.00, 12000000.00),
-(19, 8, 5, 3, 12000000.00, 36000000.00);
+(49, 16, 23, 1, 11000000.00, 11000000.00),
+(50, 16, 25, 1, 14000000.00, 14000000.00),
+(51, 16, 15, 1, 14000000.00, 14000000.00),
+(52, 16, 13, 1, 11000000.00, 11000000.00);
 
 -- --------------------------------------------------------
 
@@ -67,7 +69,8 @@ INSERT INTO `pelanggan` (`id_pelanggan`, `nama_pelanggan`, `no_telepon`, `alamat
 (2, 'Budi Santoso', '081234567890', 'Jl. Merdeka No. 10, Jakarta', '2025-12-01 04:54:26'),
 (3, 'Abdi Umiyah', '082345678901', 'Jl. Sudirman No. 25, Bandung', '2025-12-01 04:54:26'),
 (5, 'Lestari Pusmana', '084567890123', 'Jl. Diponegoro No. 30, Yogyakarta', '2025-12-01 04:54:26'),
-(6, 'mamat adiwijaya', '0834567897218', 'Jl. Gajah Mada No. 15, Surabaya', '2025-12-01 12:42:42');
+(6, 'mamat adiwijaya', '0834567897218', 'Jl. Gajah Mada No. 15, Surabaya', '2025-12-01 12:42:42'),
+(11, 'AUL PUTRI', '09812817218', 'PONOROGO', '2025-12-03 04:08:33');
 
 -- --------------------------------------------------------
 
@@ -90,14 +93,7 @@ CREATE TABLE `penjualan` (
 --
 
 INSERT INTO `penjualan` (`id_penjualan`, `id_pelanggan`, `tanggal_penjualan`, `total_harga`, `bayar`, `kembalian`, `status`) VALUES
-(1, 2, '2025-12-01 11:54:26', 90000.00, 100000.00, 10000.00, 'selesai'),
-(2, 3, '2025-12-01 11:54:26', 50000.00, 50000.00, 0.00, 'selesai'),
-(3, 1, '2025-12-01 13:19:43', 184000.00, 200000.00, 16000.00, 'selesai'),
-(4, 1, '2025-12-01 19:26:30', 133000.00, 1000000.00, 867000.00, 'selesai'),
-(5, 1, '2025-12-01 19:38:24', 600000.00, 600000.00, 0.00, 'selesai'),
-(6, 1, '2025-12-01 19:39:14', 1523500.00, 1600000.00, 76500.00, 'selesai'),
-(7, 1, '2025-12-01 19:51:21', 12000000.00, 12000000.00, 0.00, 'selesai'),
-(8, 1, '2025-12-01 21:46:41', 36000000.00, 40000000.00, 4000000.00, 'selesai');
+(16, 1, '2025-12-03 11:04:20', 50000000.00, 99999999.99, 50000000.00, 'selesai');
 
 -- --------------------------------------------------------
 
@@ -121,26 +117,47 @@ CREATE TABLE `produk` (
 --
 
 INSERT INTO `produk` (`id_produk`, `nama_produk`, `harga`, `stok`, `kategori`, `deskripsi`, `created_at`, `updated_at`) VALUES
-(5, 'LAPTOP ASUS ZENBOOK', 12000000.00, 46, 'KOMPUTER', 'Laptop Spek Ultra', '2025-12-01 04:54:26', '2025-12-01 14:46:41'),
-(12, 'ASUS Vivobook Classic', 12000000.00, 100, 'KOMPUTER', 'KOMPUTER SPEK DISKON', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(13, 'ASUS Vivobook Go', 11000000.00, 90, 'KOMPUTER', 'KOMPUTER ULTRA GAME', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
+(5, 'LAPTOP ASUS ZENBOOK', 12000000.00, 84, 'KOMPUTER', 'Laptop Spek Ultra tuf', '2025-12-01 04:54:26', '2025-12-03 04:11:42'),
+(12, 'ASUS Vivobook Classic', 12000000.00, 100, 'KOMPUTER', 'KOMPUTER SPEK DISKON', '2025-12-02 13:03:41', '2025-12-03 04:13:08'),
+(13, 'ASUS Vivobook Go', 11000000.00, 89, 'KOMPUTER', 'KOMPUTER ULTRA GAME', '2025-12-02 13:03:41', '2025-12-03 04:04:20'),
 (14, 'ASUS Vivobook E Series', 13000000.00, 70, 'KOMPUTER', 'KOMPUTER DYNAMIC GAME', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(15, 'ASUS TUF FX/F Series', 14000000.00, 90, 'KOMPUTER', 'KOMPUTER SPEK ULTRA', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(16, 'ASUS ROG Strix', 15000000.00, 90, 'KOMPUTER', 'KOMPUTER ULTRA TAF', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
+(15, 'ASUS TUF FX/F Series', 14000000.00, 89, 'KOMPUTER', 'KOMPUTER SPEK ULTRA', '2025-12-02 13:03:41', '2025-12-03 04:13:19'),
+(16, 'ASUS ROG Strix', 15000000.00, 90, 'KOMPUTER', 'KOMPUTER ULTRA TAF', '2025-12-02 13:03:41', '2025-12-03 04:13:08'),
 (17, 'ASUS ZenAiO', 16000000.00, 100, 'KOMPUTER', 'KOMPUTER SUPORT', '2025-12-02 13:03:41', '2025-12-02 13:04:30'),
-(18, 'ASUS Vivo AiO', 17000000.00, 90, 'KOMPUTER', 'KOMPUTER SUPORT GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(19, 'ASUS Transformer Book', 18000000.00, 90, 'KOMPUTER', 'KOMPUTER ULTRA GAME SPORT', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(20, 'ASUS Eee PC', 18000000.00, 100, 'KOMPUTER', 'KOMPUTER GAME', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(21, 'ASUS EeeBook', 19000000.00, 90, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(22, 'ASUS ROG (Republic of Gamers)', 12000000.00, 80, 'KOMPUTER', 'KOMPUTER SPEK SUPER GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(23, 'ASUS TUF Gaming', 11000000.00, 100, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(24, 'ASUS ProArt', 13000000.00, 80, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(25, 'ASUS Vivobook Go', 14000000.00, 70, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(26, 'ASUS Vivobook Classic', 15000000.00, 90, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
+(18, 'ASUS Vivo AiO', 17000000.00, 90, 'KOMPUTER', 'KOMPUTER SUPORT GAMING', '2025-12-02 13:03:41', '2025-12-03 04:13:15'),
+(19, 'ASUS Transformer Book', 18000000.00, 90, 'KOMPUTER', 'KOMPUTER ULTRA GAME SPORT', '2025-12-02 13:03:41', '2025-12-03 04:13:08'),
+(20, 'ASUS Eee PC', 18000000.00, 4, 'KOMPUTER', 'KOMPUTER GAME', '2025-12-02 13:03:41', '2025-12-03 04:13:19'),
+(21, 'ASUS EeeBook', 19000000.00, 6, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-03 04:13:30'),
+(22, 'ASUS ROG (Republic of Gamers)', 12000000.00, 80, 'KOMPUTER', 'KOMPUTER SPEK SUPER GAMING', '2025-12-02 13:03:41', '2025-12-03 04:13:41'),
+(23, 'ASUS TUF Gaming', 11000000.00, 99, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-03 04:13:12'),
+(24, 'ASUS ProArt', 13000000.00, 80, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-03 04:13:41'),
+(25, 'ASUS Vivobook Go', 14000000.00, 69, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-03 04:04:20'),
+(26, 'ASUS Vivobook Classic', 15000000.00, 90, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-03 04:13:08'),
 (27, 'ASUS Vivobook Flip', 16000000.00, 60, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
 (28, 'ASUS Vivobook Pro', 17000000.00, 70, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
 (29, 'ASUS VivoBook S', 18000000.00, 80, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41'),
-(30, 'ASUS Vivobook', 19000000.00, 90, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-02 13:03:41');
+(30, 'ASUS Vivobook', 19000000.00, 90, 'KOMPUTER', 'KOMPUTER SPEK GAMING', '2025-12-02 13:03:41', '2025-12-03 04:13:08');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `users`
+--
+
+CREATE TABLE `users` (
+  `id_user` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `nama_lengkap` varchar(100) DEFAULT NULL,
+  `level` enum('admin','kasir') NOT NULL DEFAULT 'kasir'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `users`
+--
+
+INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `level`) VALUES
+(1, 'admin', '$2y$10$pwsdVuLsU9wT8sjjmMXTm..kCgez0QxfAwBgU3eo.JQPzTEwm6gVy', 'Administrator', 'admin');
 
 -- --------------------------------------------------------
 
@@ -199,6 +216,13 @@ ALTER TABLE `produk`
   ADD PRIMARY KEY (`id_produk`);
 
 --
+-- Indeks untuk tabel `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id_user`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
 -- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
@@ -206,25 +230,31 @@ ALTER TABLE `produk`
 -- AUTO_INCREMENT untuk tabel `detail_penjualan`
 --
 ALTER TABLE `detail_penjualan`
-  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT untuk tabel `pelanggan`
 --
 ALTER TABLE `pelanggan`
-  MODIFY `id_pelanggan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_pelanggan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT untuk tabel `penjualan`
 --
 ALTER TABLE `penjualan`
-  MODIFY `id_penjualan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_penjualan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT untuk tabel `produk`
 --
 ALTER TABLE `produk`
-  MODIFY `id_produk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id_produk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT untuk tabel `users`
+--
+ALTER TABLE `users`
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)

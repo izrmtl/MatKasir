@@ -15,23 +15,48 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'success') {
     $success = 'Anda telah berhasil logout dari sistem.';
 }
 
+// Process login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once 'config.php';
+
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
     
-    // Default credentials: admin / admin123
-    if ($username === 'admin' && $password === 'admin123') {
-        // Regenerate session ID for security
-        session_regenerate_id(true);
+    $database = new Database();
+    $db = $database->getConnection();
+
+    // Prepare statement to prevent SQL injection
+    $query = "SELECT id_user, username, password, nama_lengkap, level FROM users WHERE username = :username";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+
+    // Check if user exists
+    if ($stmt->rowCount() > 0) {
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        $_SESSION['logged_in'] = true;
-        $_SESSION['username'] = $username;
-        $_SESSION['login_time'] = time();
-        $_SESSION['last_activity'] = time();
-        
-        header('Location: index.php');
-        exit;
+        // Verify password
+        if (password_verify($password, $user['password'])) {
+            // Password is correct, start a new session
+            session_regenerate_id(true); // Prevent session fixation
+            
+            $_SESSION['logged_in'] = true;
+            $_SESSION['id_user'] = $user['id_user'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
+            $_SESSION['level'] = $user['level'];
+            $_SESSION['login_time'] = time();
+            $_SESSION['last_activity'] = time();
+
+            // Redirect to dashboard
+            header('Location: index.php');
+            exit;
+        } else {
+            // Password is not correct
+            $error = 'Username atau password salah!';
+        }
     } else {
+        // Username does not exist
         $error = 'Username atau password salah!';
     }
 }
@@ -520,23 +545,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </form>
 
-            <div class="divider">
-                <span>Info</span>
-            </div>
-
-            <div class="credentials-hint">
-                <div class="credentials-hint-title">
-                    <i class="fas fa-info-circle"></i>
-                    Kredensial Default
-                </div>
-                <div class="credentials-hint-content">
-                    <strong>Username:</strong> admin<br>
-                    <strong>Password:</strong> admin123
-                </div>
-            </div>
 
             <div class="login-footer">
-                &copy; 2025 Aplikasi Kasir UMKM | Dibuat dengan <i class="fas fa-heart"></i> untuk UMKM Indonesia
+                &copy; 2025 Aplikasi Kasir UMKM | Dibuat dengan untuk UMKM Indonesia
             </div>
         </div>
     </div>

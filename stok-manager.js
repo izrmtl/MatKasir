@@ -110,7 +110,7 @@ async function handleAddProduct() {
             showNotification('Produk berhasil ditambahkan!', 'success');
             clearProductForm();
             await loadProductsForManagement();
-            // Also refresh the POS product list
+            // Also refresh POS product list
             await loadProducts(); 
         } else {
             showNotification('Gagal menambahkan produk: ' + (result.message || 'Unknown error'), 'error');

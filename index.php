@@ -1060,8 +1060,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             color: #721c24;
         }
 
-        /* ... di dalam <style> di index.php ... */
-
         /* Detail Penjualan Page Styles */
         .sale-info-grid {
             display: grid;
@@ -1188,7 +1186,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 <span>Kasir UMKM</span>
             </div>
         </div>
-        <!-- ... di dalam index.php ... -->
         <div class="sidebar-menu">
             <a href="#" class="sidebar-menu-item active" data-page="dashboard">
                 <i class="bi bi-speedometer2"></i>
@@ -1211,7 +1208,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 Riwayat
             </a>
         </div>
-        <!-- ... -->
         <div class="sidebar-footer">
             <div class="user-info">
                 <div class="user-avatar">
@@ -1581,7 +1577,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             <!-- ==========================================
      HALAMAN DETAIL PENJUALAN
      ========================================== -->
-            <div id="detailPenjualanPage" class="page">
+            <div id="detail-penjualanPage" class="page">
                 <div class="form-container">
                     <button class="btn btn-secondary" onclick="showPage('riwayat')">
                         <i class="bi bi-arrow-left"></i> Kembali ke Riwayat
@@ -1680,6 +1676,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
 <script>
     // Fungsi untuk memperbarui info debug
+  // ... kode sebelumnya ...
+
     function updateDebugInfo() {
         const debugDiv = document.getElementById('debugInfo');
         if (debugDiv) {
@@ -1702,10 +1700,33 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             setTimeout(updateDebugInfo, 100);
         }
     };
+
+    // Tambahkan event listener untuk form produk
+    document.getElementById('btnAddProduct').addEventListener('click', function() {
+        handleAddProduct();
+    });
+
+    // Tambahkan event listener untuk form pelanggan
+    document.getElementById('btnAddCustomer').addEventListener('click', function() {
+        handleAddCustomer();
+    });
+
+    // Tambahkan event listener untuk search produk
+    document.getElementById('searchProductTable').addEventListener('input', function(e) {
+        handleProductTableSearch(e);
+    });
+
+    // Tambahkan event listener untuk search pelanggan
+    document.getElementById('searchCustomerTable').addEventListener('input', function(e) {
+        handleCustomerTableSearch(e);
+    });
+
+    // Tambahkan event listener untuk search produk di kasir
+    document.getElementById('searchProduct').addEventListener('input', function(e) {
+        handleProductSearch(e);
+    });
 </script>
 
-</body>
-</html>
 </body>
 
 </html>
